@@ -4,13 +4,27 @@ s.boot;
 t = Task{
 	var hz = 4;
 	var i = 0;
-	var n= 0.25;
+	var n = 0.25;
 	var chipsize = 10;
+
+	// allocate a disk i/o buffer
+	p = Buffer.alloc(s, 65536, 2);
+
+	// create an output file for this buffer, leave it open
+	p.write("Output.wav", "wav", "int16", 0, 0, true);
+	// start recording
+	d = Synth.tail(nil, "help-Diskout", ["bufnum", p.bufnum]);
+
+	//buffer for granular synthesis sample
+	b = Buffer.read(s,"/usr/share/SuperCollider/sounds/a11wlk01-44_1.aiff");
+
 	1.do{
+
 		x = Synth(\SinPulser);
-		10.wait;
+		1.wait;
 		x.free;
 	};
+
 	2.do{
 		hz = 4;
 		a = Scale.choose;
@@ -22,6 +36,7 @@ t = Task{
 		};
 
 		Synth(\eightbitSnare);
+		y.free;
 		i = 0;
 		hz = hz * 2;
 		//new speed
@@ -47,20 +62,23 @@ t = Task{
 			x.free;
 		};
 	};
-	4.do{
+
+	5.do{
 		x = Synth.new(\ambientBackground);
-		5.wait;
+		4.wait;
 		x.free;
 	};
+
 	2.do{
+		a = Scale.choose;
 		x =  Synth.new(\ambientBackground);
-		1.wait;
+		2.wait;
 		y = Synth(\SinPulser);
-		1.wait;
+		4.wait;
 		Synth(\eightbitSnare);
-		i=0;
+		i = 0;
 		hz = hz * 1.5;
-		n = 0.33;
+		n = 0.4;
 		chipsize.do {
 			Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
 			i = i + 1;
@@ -72,14 +90,12 @@ t = Task{
 
 	1.do{
 		hz = 1;
-		b = Buffer.read(s,"/usr/share/SuperCollider/sounds/a11wlk01-44_1.aiff");
-		30.do{
-			x = Synth.new(\granularSynth, [\sndbuf, b, \hz, hz, \dur, 1]);
-			hz.wait;
-			hz = hz * 0.95;
-			x.free;
+	 	30.do{
+	 		x = Synth.new(\granularSynth, [\sndbuf, b, \hz, hz, \dur, 1]);
+	 		hz.wait;
+	 		hz = hz * 0.95;
+	 		x.free;
 		};
-
 	};
 
 	1.do{
@@ -90,7 +106,7 @@ t = Task{
 	1.do{
 		x = Synth.new(\moogPulser);
 		y = Synth.new(\SawPulser);
-		15.wait;
+		10.wait;
 		x.free;
 		y.free;
 	};
@@ -123,7 +139,7 @@ t = Task{
 		hz = hz * 1.5;
 		//new speed
 		n = 0.2;
-		a = Scale.choose;f
+		a = Scale.choose;
 		chipsize.do {
 			Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
 			i = i + 1;
@@ -131,13 +147,16 @@ t = Task{
 		};
 		x.free;
 	};
+
+	// stop recording
+	d.free;
+	p.close;
+	p.free;
 };
 t.start;
-f = File("/usr/share/SuperCollider/sounds/test.wav",w);
-f.write(t);
-)
 
-(
+
+
 SynthDef(\eightbitSnare, {
 	var sig, freq, amp, env;
 
@@ -148,10 +167,8 @@ SynthDef(\eightbitSnare, {
 
 	Out.ar(0,sig * 0.7);
 	Out.ar(1,sig * 0.7);
-}).add;
-)
+}).writeDefFile.load(s);
 
-(
 SynthDef(\chiptune, {
 	arg fund = 120, hz = 5;
 	var env, sig, amp, freq;
@@ -162,10 +179,8 @@ SynthDef(\chiptune, {
 	sig = env * FreeVerb.ar(sig, 0.7, 0.8, 0.25);
 	Out.ar(0, sig * 0.8);
 	Out.ar(1, sig * 0.8);
-}).add;
-)
+}).writeDefFile.load(s);
 
-(
 SynthDef(\ambientBackground, {
 	var env, freq, sig;
 
@@ -182,10 +197,8 @@ SynthDef(\ambientBackground, {
 
 	Out.ar(0, sig);
 	Out.ar(1, sig);
-}).add;
-)
+}).writeDefFile.load(s);
 
-(
 SynthDef(\SawPulser, {
 	var pitchRand, env, freq, sig;
 
@@ -195,10 +208,8 @@ SynthDef(\SawPulser, {
 
 	Out.ar(0, sig);
 	Out.ar(1, sig);
-}).add;
-)
+}).writeDefFile.load(s);
 
-(
 SynthDef(\moogPulser, {
 	var sig;
 
@@ -208,11 +219,8 @@ SynthDef(\moogPulser, {
         0.83 * 4);
 
 	Out.ar(0,sig);
-	Out.ar(1, sig);
-}).add;
-)
+}).writeDefFile.load(s);
 
-(
 SynthDef(\SinPulser, {
 	var pitchRand, env, freq, sig;
 
@@ -222,27 +230,20 @@ SynthDef(\SinPulser, {
 	sig = SinOsc.ar(freq * 0.5);
 	sig = FreeVerb.ar(sig, 0.525, 0.915, 0.5);
 
-	Out.ar(0, sig);
-	Out.ar(1, sig);
-}).add;
-)
-
-
-(
-var winenv;
-
-// a custom envelope
-winenv = Env([0, 1, 0], [0.5, 0.5], [8, -8]);
-z = Buffer.sendCollection(s, winenv.discretize, 1);
+	Out.ar(0, sig * 0.8);
+	Out.ar(1, sig * 0.8);
+}).writeDefFile.load(s);
 
 SynthDef(\granularSynth, {
 	arg  sndbuf, hz = 100, dur=0.1;
-    // use mouse x to control panning
-    Out.ar(0,
-        GrainBuf.ar(2, Impulse.kr(hz), dur, sndbuf, LFNoise1.kr.range(0.5, 2),
-            LFNoise2.kr(0.1).range(0, 1), 2, 0, -1));
-    Out.ar(1,
-        GrainBuf.ar(2, Impulse.kr(hz), dur, sndbuf, LFNoise1.kr.range(0.5, 2),
-            LFNoise2.kr(0.1).range(0, 1), 2, 0, -1));
-}).add;
+
+	var winenv, sig;
+	// a custom envelope
+	winenv = Env([0, 1, 0], [0.5, 0.5], [8, -8]);
+	z = Buffer.sendCollection(s, winenv.discretize, 1);
+
+	sig =  GrainBuf.ar(2, Impulse.kr(hz), dur, sndbuf, LFNoise1.kr.range(0.5, 2), LFNoise2.kr(0.1).range(0, 1), 2, 0, -1);
+	// use mouse x to control panning
+    Out.ar(0,sig);
+}).writeDefFile.load(s);
 )
