@@ -46,17 +46,37 @@
 
 
       <section id="main_content">
-        <h2>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Cosc 4p98 Assignment 3.</h2>
+        <h3>
+<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Cosc 4p98 Assignment 3.</h3>
 
 <p>Here I will describe the structure, techniques, and effects in my composition. As well as detail about the instruments I've created.</p>
 
 
         <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Cosc 4p98 Assignment 3</h3>
+<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Structure of Song</h3>
 
 
-<p>Here I will describe the structure, techniques, and effects in my composition. As well as detail about the instruments I've created.</p>
+<p>The song is 2 minutes in length, composed of sounds and instruments.</p>
+  <p>
+  It begins with 10 seconds of a custom synth called the SinPulser. The SinPulser takes no parameters, and oscilates the freqency of a
+  sine wave by sending the frequency through 2 rate based value generators. The order of value generators and the final processing through 
+  a reverb generator leads to a very eiry mysterious sound.
+  </p>
+  <p>
+  It then plays a chiptune like song for around 18 seconds using a custom chiptune synth. The frequency of the notes are based on a supercollider scale in attempts
+  create a musical sounding pattern. The chiptune synth takes 2 parameters. The frequency of the note, and the frequency of the amplitude pulse.
+  The larger the amplitude pulse, the more the notes will overlap. Using a pulse wave, a pulse oscilator is used to create grains of the pulse wave.
+  The pulse grain has reverb applied and is enveloped.
+  </p>
+  <p>
+  Then 20 seconds of ambient noises created with another custom synth. This synth is called ambientBackground and has 3 parts. The first part is a saw wave with the
+  frequency chosen at a rate by a random value generator. Reverb is added to this sound. This was used to create strange quite complex sounds. Then a sine wave is used
+  to create more simple constant oscilating noise. The frequency of the sine wave is chosen at a rate by a random value generator at a frequency determined by pink noise.
+  Lastly a pulse wave is used, with frequencies genrated at a rate by a random value generator at a frequency determnined by pink noise. All these noises then have reverb 
+  added to them. The result is ominous and dynamic, rarely ever sounding the exact same.
+  </p>
+  
+</p>
 
 </section>
 
