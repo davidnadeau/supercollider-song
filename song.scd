@@ -5,20 +5,20 @@ t = Task{
 	var hz = 4;
 	var i = 0;
 	var n= 0.25;
-	var chipsize = 12;
+	var chipsize = 10;
 	1.do{
 		x = Synth(\SinPulser);
-		1.wait;
+		10.wait;
 		x.free;
 	};
-	1.do{
+	2.do{
 		hz = 4;
-		Synth(\eightbitSnare);
 		a = Scale.choose;
 		chipsize.do {
-			Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
+			x = Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
 			i = i + 1;
 			n.wait;
+			x.free;
 		};
 
 		Synth(\eightbitSnare);
@@ -28,9 +28,10 @@ t = Task{
 		n = 0.15;
 		a = Scale.choose;
 		chipsize.do {
-			Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
+			x = Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
 			i = i + 1;
 			n.wait;
+			x.free;
 		};
 
 		Synth(\eightbitSnare);
@@ -40,17 +41,18 @@ t = Task{
 		n = 0.2;
 		a = Scale.choose;
 		chipsize.do {
-			Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
+			x = Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
 			i = i + 1;
 			n.wait;
+			x.free;
 		};
 	};
-	1.do{
+	4.do{
 		x = Synth.new(\ambientBackground);
-		1.wait;
+		5.wait;
 		x.free;
 	};
-	1.do{
+	2.do{
 		x =  Synth.new(\ambientBackground);
 		1.wait;
 		y = Synth(\SinPulser);
@@ -67,13 +69,15 @@ t = Task{
 		x.free;
 		y.free;
 	};
+
 	1.do{
 		hz = 1;
 		b = Buffer.read(s,"/usr/share/SuperCollider/sounds/a11wlk01-44_1.aiff");
-		100.do{
-			Synth.new(\granularSynth, [\sndbuf, b, \hz, hz, \dur, 1]);
-			(0.25).wait;
-			hz = hz * 1.2;
+		30.do{
+			x = Synth.new(\granularSynth, [\sndbuf, b, \hz, hz, \dur, 1]);
+			hz.wait;
+			hz = hz * 0.95;
+			x.free;
 		};
 
 	};
@@ -119,56 +123,19 @@ t = Task{
 		hz = hz * 1.5;
 		//new speed
 		n = 0.2;
-		a = Scale.choose;
+		a = Scale.choose;f
 		chipsize.do {
 			Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
 			i = i + 1;
 			n.wait;
 		};
 		x.free;
-	};
-	20.do{
-		x =  Synth.new(\ambientBackground);
-		//y = Synth.new(\moogPulser);
-		hz = 4;
-		Synth(\eightbitSnare);
-		a = Scale.choose;
-		chipsize.do {
-			Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
-			i = i + 1;
-			n.wait;
-		};
-
-		Synth(\eightbitSnare);
-		i = 0;
-		hz = hz * 2;
-		//new speed
-		n = 0.15;
-		a = Scale.choose;
-		chipsize.do {
-			Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
-			i = i + 1;
-			n.wait;
-		};
-
-		Synth(\eightbitSnare);
-		i=0;
-		hz = hz * 1.5;
-		//new speed
-		n = 0.2;
-		a = Scale.choose;
-		chipsize.do {
-			Synth(\chiptune, [\fund,a.cents[i % a.size] + 1, \hz, hz]);
-			i = i + 1;
-			n.wait;
-		};
-		x.free;
-		//y.free;
 	};
 };
 t.start;
+f = File("/usr/share/SuperCollider/sounds/test.wav",w);
+f.write(t);
 )
-
 
 (
 SynthDef(\eightbitSnare, {
@@ -180,45 +147,43 @@ SynthDef(\eightbitSnare, {
 
 
 	Out.ar(0,sig * 0.7);
+	Out.ar(1,sig * 0.7);
 }).add;
-Synth.new(\eightbitSnare);
 )
 
 (
 SynthDef(\chiptune, {
-	arg fund = 120, hz = 8;
+	arg fund = 120, hz = 5;
 	var env, sig, amp, freq;
 
 	amp = LFPulse.ar(hz, 0, 0.5);
 	env = EnvGen.ar(Env.perc);
-	sig = Pulse.ar(fund, 0.5, amp)* env;
-
-	sig = FreeVerb.ar(sig, 0.7, 0.8, 0.25);
+	sig = Pulse.ar(fund, 0.5, amp);
+	sig = env * FreeVerb.ar(sig, 0.7, 0.8, 0.25);
 	Out.ar(0, sig * 0.8);
+	Out.ar(1, sig * 0.8);
 }).add;
 )
-
 
 (
 SynthDef(\ambientBackground, {
 	var env, freq, sig;
 
-	//env = EnvGen.ar(Env.perc, doneAction: 2);
 	freq = LFNoise2.ar(1, 100, LFDNoise0.ar(1, 100, 220));
 	sig = LFSaw.ar(freq, 2, 0.1);
-	sig = FreeVerb.ar(sig, 0.5, 0.5, 0.4);
+	sig = FreeVerb.ar(sig, 0.5, 0.5, 0.3);
 
 	freq = LFDNoise0.ar(PinkNoise.kr(10), 100, 220);
 	sig = sig + SinOsc.ar(freq, 0.5 , 0.5);
 
 	freq = LFDNoise0.ar(PinkNoise.kr(10), 100, 220);
-	sig = Pulse.ar(freq, 0.5, 0.3);
+	sig = sig + Pulse.ar(freq, 0.5, 0.3);
 	sig = FreeVerb.ar(sig, 0.9, 0.9, 0.3, 0.8);
 
 	Out.ar(0, sig);
+	Out.ar(1, sig);
 }).add;
 )
-
 
 (
 SynthDef(\SawPulser, {
@@ -229,6 +194,7 @@ SynthDef(\SawPulser, {
 	sig = Saw.ar(freq) * (HenonN.ar(5)*0.5);
 
 	Out.ar(0, sig);
+	Out.ar(1, sig);
 }).add;
 )
 
@@ -242,6 +208,7 @@ SynthDef(\moogPulser, {
         0.83 * 4);
 
 	Out.ar(0,sig);
+	Out.ar(1, sig);
 }).add;
 )
 
@@ -256,15 +223,8 @@ SynthDef(\SinPulser, {
 	sig = FreeVerb.ar(sig, 0.525, 0.915, 0.5);
 
 	Out.ar(0, sig);
+	Out.ar(1, sig);
 }).add;
-)
-
-
-b = Buffer.read(s, "/home/soote/documents/school/4p98/a3/SuperCollider/vertical.wav");
-(
-x = SynthDef("tutorial-PlayBuf",{ arg bufnum;
-	Out.ar( 0,PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum)))
-}).play(s,[\bufnum, b.bufnum ]);
 )
 
 
@@ -276,11 +236,13 @@ winenv = Env([0, 1, 0], [0.5, 0.5], [8, -8]);
 z = Buffer.sendCollection(s, winenv.discretize, 1);
 
 SynthDef(\granularSynth, {
-	arg  sndbuf, hz = 10, dur=0.1;
+	arg  sndbuf, hz = 100, dur=0.1;
     // use mouse x to control panning
     Out.ar(0,
         GrainBuf.ar(2, Impulse.kr(hz), dur, sndbuf, LFNoise1.kr.range(0.5, 2),
-            LFNoise2.kr(0.1).range(0, 1), 2, 0, -1))
-
+            LFNoise2.kr(0.1).range(0, 1), 2, 0, -1));
+    Out.ar(1,
+        GrainBuf.ar(2, Impulse.kr(hz), dur, sndbuf, LFNoise1.kr.range(0.5, 2),
+            LFNoise2.kr(0.1).range(0, 1), 2, 0, -1));
 }).add;
 )
