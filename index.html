@@ -58,24 +58,40 @@
 
 <p>The song is 2 minutes in length, composed of sounds and instruments.</p>
   <p>
-  It begins with 10 seconds of a custom synth called the SinPulser. The SinPulser takes no parameters, and oscilates the freqency of a
+    It begins with 10 seconds of a custom synth called the SinPulser. The SinPulser takes no parameters, and oscilates the freqency of a
   sine wave by sending the frequency through 2 rate based value generators. The order of value generators and the final processing through 
   a reverb generator leads to a very eiry mysterious sound.
   </p>
   <p>
-  It then plays a chiptune like song for around 18 seconds using a custom chiptune synth. The frequency of the notes are based on a supercollider scale in attempts
+    It then plays a chiptune like song for around 18 seconds using a custom chiptune synth. The frequency of the notes are based on a supercollider scale in attempts
   create a musical sounding pattern. The chiptune synth takes 2 parameters. The frequency of the note, and the frequency of the amplitude pulse.
   The larger the amplitude pulse, the more the notes will overlap. Using a pulse wave, a pulse oscilator is used to create grains of the pulse wave.
-  The pulse grain has reverb applied and is enveloped.
+  The pulse grain has reverb applied and is enveloped. There is also another custom 8bit snare synth that plays every 12 notes. It is created by applying an envelope
+  to some white noise and adding some reverb.
   </p>
   <p>
-  Then 20 seconds of ambient noises created with another custom synth. This synth is called ambientBackground and has 3 parts. The first part is a saw wave with the
+    Then 20 seconds of ambient noises created with another custom synth. This synth is called ambientBackground and has 3 parts. The first part is a saw wave with the
   frequency chosen at a rate by a random value generator. Reverb is added to this sound. This was used to create strange quite complex sounds. Then a sine wave is used
   to create more simple constant oscilating noise. The frequency of the sine wave is chosen at a rate by a random value generator at a frequency determined by pink noise.
   Lastly a pulse wave is used, with frequencies genrated at a rate by a random value generator at a frequency determnined by pink noise. All these noises then have reverb 
   added to them. The result is ominous and dynamic, rarely ever sounding the exact same.
   </p>
-  
+  <p>
+    Then 12 seconds of a mix of the ambient backgrund, sin pulser, eightbit snare, and the chiptune pulse synth.
+  </p>
+  <p>
+    Then 15 seconds of a granular synthesiser applied to some stock supercollider audio. The granular synthesis technique was paraphrased from the supercollider docs.
+  </p>
+  <p>
+    Then 5 seconds a new custom synth called the Saw Pulser. A rated random value generator is used as the frequency, and a Hennon chaotic generator is multiplied to the saw wave
+    for an interesting clubby beat.
+  </p>
+  <p>
+    Then 15 seconds of the saw pulser with a new custom synth called the Moog pulser. The moog pulser uses the MoogFF generator. MoogFF generator paraphrased from supercollider docs.
+  </p>
+  <p>
+    Then 20 seconds of the moog pulse, the eightbit snare, and the chiptune synth.
+  </p>
 </p>
 
 </section>
